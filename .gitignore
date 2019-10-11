@@ -20,3 +20,5 @@ gradlew.bat
 *.iws
 *.zip
 *.log
+
+results.json
