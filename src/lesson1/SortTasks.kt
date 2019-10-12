@@ -36,30 +36,25 @@ import java.util.*
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  *
- * Трудоёмкость: O(n + n * log(n) + n) = O(n * log(n))
- * Ресурсоёмкость: O(n + n) = O(n)
+ * //     Трудоёмкость: O(n * log(n))
+ * //     Ресурсоёмкость: O(n)
  */
 fun sortTimes(inputName: String, outputName: String) {
-    val times = File(inputName).readLines()
+    val sortedTimes = mutableListOf<Date>()
+    val timeFormat = SimpleDateFormat("hh:mm:ss a")
 
-    File(outputName).bufferedWriter().use { writer ->
+    for (line in File(inputName).readLines()) {
+        require("""\d{2}:\d{2}:\d{2} (AM|PM)""".toRegex().matches(line))
 
-        val sortedTimes = mutableListOf<Date>()
-        val timeFormat = SimpleDateFormat("hh:mm:ss a")
-
-        for (line in times) {
-            require("""\d{2}:\d{2}:\d{2} (AM|PM)""".toRegex().matches(line))
-            sortedTimes.add(timeFormat.parse(line))
-        }
-
-        sortedTimes.sort()
-
-        sortedTimes.forEach { line ->
-            writer.write("${timeFormat.format(line)}\n")
-        }
-
-        writer.close()
+        sortedTimes.add(timeFormat.parse(line))
     }
+
+    sortedTimes.sort()
+
+    File(outputName).writeText(sortedTimes
+        .joinToString("\n") { date ->
+            timeFormat.format(date)
+        })
 }
 
 /**
@@ -88,34 +83,31 @@ fun sortTimes(inputName: String, outputName: String) {
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  *
- * Трудоёмкость: O(n + log(n) + n) = O(log(n))
- * Ресурсоёмкость: O(n + n) = O(n)
+ * //     Трудоёмкость: O(log(n))
+ * //     Ресурсоёмкость: O(n)
  */
 fun sortAddresses(inputName: String, outputName: String) {
-    val lines = File(inputName).readLines()
     val mapOfAddresses = mutableMapOf<Pair<String, Int>, SortedSet<String>>()
 
-    File(outputName).bufferedWriter().use { writer ->
-        for (line in lines) {
-            require(
-                """[А-ЯЁA-Z][А-ЯЁA-Zа-яa-zё-]* [А-ЯA-ZЁ][А-ЯЁA-Zа-яa-zё-]* - [А-ЯA-ZЁ][А-ЯЁA-Zа-яa-zё-]* \d+"""
-                    .toRegex().matches(line)
-            )
-            val (name, address) = line.split(" - ")
-            val splitAddress = address.split(" ")
-            val street = splitAddress[0]
-            val house = splitAddress[1].toInt()
+    for (line in File(inputName).readLines()) {
+        require(
+            """[А-ЯЁA-Z][А-ЯЁA-Zа-яa-zё-]* [А-ЯA-ZЁ][А-ЯЁA-Zа-яa-zё-]* - [А-ЯA-ZЁ][А-ЯЁA-Zа-яa-zё-]* \d+"""
+                .toRegex().matches(line)
+        )
+        val (name, address) = line.split(" - ")
+        val splitAddress = address.split(" ")
+        val street = splitAddress[0]
+        val house = splitAddress[1].toInt()
 
-            mapOfAddresses.getOrPut(street to house) { sortedSetOf(name) }.add(name)
-        }
-
-        val sortedAddresses = mapOfAddresses.toSortedMap(compareBy({ it.first }, { it.second }))
-
-        for ((address, name) in sortedAddresses)
-            writer.write("${address.first} ${address.second} - ${name.joinToString(", ")}\n")
-
-        writer.close()
+        mapOfAddresses.getOrPut(street to house) { sortedSetOf(name) }.add(name)
     }
+
+    val sortedAddresses = mapOfAddresses.toSortedMap(compareBy({ it.first }, { it.second }))
+
+    File(outputName).writeText(sortedAddresses.toList()
+        .joinToString("\n") { (address, name) ->
+            "${address.first} ${address.second} - ${name.joinToString(", ")}"
+        })
 }
 
 /**
@@ -148,8 +140,8 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 99.5
  * 121.3
  *
- *    Трудоёмкость: O(n)
- *    Ресурсоёмкость: O(n)
+ * //     Трудоёмкость: O(n)
+ * //     Ресурсоёмкость: O(n)
  */
 fun sortTemperatures(inputName: String, outputName: String) {
     val listOfTemps = mutableListOf<Int>()
@@ -167,8 +159,8 @@ fun sortTemperatures(inputName: String, outputName: String) {
     val sortedTempsArray = countingSort(listOfTemps.toIntArray(), listOfTemps.max() ?: 0)
 
     File(outputName).writeText(sortedTempsArray
-        .joinToString("\n") {
-            ((it - min) / 10).toString()
+        .joinToString("\n") { temp ->
+            ((temp - min) / 10).toString()
         })
 }
 
@@ -218,18 +210,23 @@ fun sortSequence(inputName: String, outputName: String) {
  * second = [null null null null null 1 3 9 13 18 23]
  *
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
+ *
+ * //     Трудоёмкость: O(n)
+ * //     Ресурсоёмкость: O(1)
  */
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
-    var left = 0
-    var right = first.size
+    var firstIndex = 0
+    var secondIndex = first.size
 
     for (i in second.indices)
-        if (left < first.size && (right == second.size || first[left] <= second[right]!!)) {
-            second[i] = first[left]
-            left++
+        if (secondIndex >= second.size ||
+            firstIndex < first.size && first[firstIndex] <= second[secondIndex]!!
+        ) {
+            second[i] = first[firstIndex]
+            firstIndex++
         } else {
-            second[i] = second[right]
-            right++
+            second[i] = second[secondIndex]
+            secondIndex++
         }
 }
 
