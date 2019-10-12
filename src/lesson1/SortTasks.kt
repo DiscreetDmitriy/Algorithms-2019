@@ -147,9 +147,29 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 24.7
  * 99.5
  * 121.3
+ *
+ *    Трудоёмкость: O(n)
+ *    Ресурсоёмкость: O(n)
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    val listOfTemps = mutableListOf<Int>()
+
+    val min = 273.0 * 10
+
+    for (line in File(inputName).readLines()) {
+        val temp = line.toDouble()
+
+        require(temp in -273.0..500.0)
+
+        listOfTemps.add((temp * 10 + min).toInt())
+    }
+
+    val sortedTempsArray = countingSort(listOfTemps.toIntArray(), listOfTemps.max() ?: 0)
+
+    File(outputName).writeText(sortedTempsArray
+        .joinToString("\n") {
+            ((it - min) / 10).toString()
+        })
 }
 
 /**
