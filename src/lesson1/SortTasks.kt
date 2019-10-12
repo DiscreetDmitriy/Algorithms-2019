@@ -2,6 +2,10 @@
 
 package lesson1
 
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+
 /**
  * Сортировка времён
  *
@@ -31,9 +35,31 @@ package lesson1
  * 07:56:14 PM
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
+ *
+ * Трудоемкость: O(n + n * log(n) + n) = O(n * log(n))
+ * Ресурсоёмкость: O(n + n) = O(n)
  */
 fun sortTimes(inputName: String, outputName: String) {
-    TODO()
+    val times = File(inputName).readLines()
+
+    File(outputName).bufferedWriter().use { writer ->
+
+        val sortedTimes = mutableListOf<Date>()
+        val timeFormat = SimpleDateFormat("hh:mm:ss a")
+
+        for (line in times) {
+            require("""\d{2}:\d{2}:\d{2} (AM|PM)""".toRegex().matches(line))
+            sortedTimes.add(timeFormat.parse(line))
+        }
+
+        sortedTimes.sort()
+
+        sortedTimes.forEach { line ->
+            writer.write("${timeFormat.format(line)}\n")
+        }
+
+        writer.close()
+    }
 }
 
 /**
