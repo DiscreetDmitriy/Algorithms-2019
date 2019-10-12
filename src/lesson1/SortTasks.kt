@@ -192,9 +192,36 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  * 2
  * 2
+ *
+ * //     Трудоёмкость: O(n)
+ * //     Ресурсоёмкость: O(n)
  */
 fun sortSequence(inputName: String, outputName: String) {
-    TODO()
+    val numbers = File(inputName).readLines().map { it.toInt() }
+
+    val duplicates = numbers
+        .groupingBy { it }
+        .eachCount()
+
+    val maxRepeats = duplicates.values.max() ?: 0
+    var minRepeatedNumber = Int.MAX_VALUE
+
+    for ((number, repeats) in duplicates)
+        if (repeats == maxRepeats && number < minRepeatedNumber)
+            minRepeatedNumber = number
+
+    val sequence = mutableListOf<Int>()
+    val maxSequence = mutableListOf<Int>()
+
+    for (number in numbers)
+        if (number == minRepeatedNumber)
+            maxSequence.add(number)
+        else
+            sequence.add(number)
+
+    sequence.addAll(maxSequence)
+
+    File(outputName).writeText(sequence.joinToString("\n"))
 }
 
 /**
