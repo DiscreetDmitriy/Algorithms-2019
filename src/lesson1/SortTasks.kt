@@ -36,7 +36,7 @@ import java.util.*
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  *
- * Трудоемкость: O(n + n * log(n) + n) = O(n * log(n))
+ * Трудоёмкость: O(n + n * log(n) + n) = O(n * log(n))
  * Ресурсоёмкость: O(n + n) = O(n)
  */
 fun sortTimes(inputName: String, outputName: String) {
@@ -87,9 +87,35 @@ fun sortTimes(inputName: String, outputName: String) {
  * Садовая 5 - Сидоров Петр, Сидорова Мария
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
+ *
+ * Трудоёмкость: O(n + log(n) + n) = O(log(n))
+ * Ресурсоёмкость: O(n + n) = O(n)
  */
 fun sortAddresses(inputName: String, outputName: String) {
-    TODO()
+    val lines = File(inputName).readLines()
+    val mapOfAddresses = mutableMapOf<Pair<String, Int>, SortedSet<String>>()
+
+    File(outputName).bufferedWriter().use { writer ->
+        for (line in lines) {
+            require(
+                """[А-ЯЁA-Z][А-ЯЁA-Zа-яa-zё-]* [А-ЯA-ZЁ][А-ЯЁA-Zа-яa-zё-]* - [А-ЯA-ZЁ][А-ЯЁA-Zа-яa-zё-]* \d+"""
+                    .toRegex().matches(line)
+            )
+            val (name, address) = line.split(" - ")
+            val splitAddress = address.split(" ")
+            val street = splitAddress[0]
+            val house = splitAddress[1].toInt()
+
+            mapOfAddresses.getOrPut(street to house) { sortedSetOf(name) }.add(name)
+        }
+
+        val sortedAddresses = mapOfAddresses.toSortedMap(compareBy({ it.first }, { it.second }))
+
+        for ((address, name) in sortedAddresses)
+            writer.write("${address.first} ${address.second} - ${name.joinToString(", ")}\n")
+
+        writer.close()
+    }
 }
 
 /**
