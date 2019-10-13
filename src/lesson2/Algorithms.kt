@@ -3,6 +3,8 @@
 package lesson2
 
 import java.io.File
+import kotlin.math.sqrt
+
 
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
@@ -168,9 +170,21 @@ fun longestCommonSubstring(first: String, second: String): String {
  *
  * Справка: простым считается число, которое делится нацело только на 1 и на себя.
  * Единица простым числом не считается.
+ *
+ * //     Трудоёмкость: O(n * log(log(n)))
+ * //     Ресурсоёмкость: O(n)
  */
 fun calcPrimesNumber(limit: Int): Int {
-    TODO()
+    if (limit < 2) return 0
+
+    val values = BooleanArray((limit / 2)) { true }
+
+    for (i in 3..sqrt(limit.toDouble()).toInt() step 2)
+        if (values[i / 2])
+            for (j in i * i..limit step i)
+                if (j % 2 == 1) values[j / 2] = false
+
+    return values.filter { it }.count()
 }
 
 /**
