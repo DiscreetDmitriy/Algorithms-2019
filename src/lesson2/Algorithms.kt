@@ -2,6 +2,8 @@
 
 package lesson2
 
+import java.io.File
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -25,9 +27,56 @@ package lesson2
  * Например, для приведённого выше файла результат должен быть Pair(3, 4)
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
+ *
+ * //     Трудоёмкость: O(n)
+ * //     Ресурсоёмкость: O(n)
  */
 fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
-    TODO()
+    val stocks = File(inputName).readLines().map {
+        require(it.matches(Regex("""^\d+$""")))
+        it.toInt()
+    }
+
+    val arrayOfMin = IntArray(stocks.size) { Int.MAX_VALUE }
+    val arrayOfMinDays = IntArray(stocks.size) { 0 }
+
+    arrayOfMin[0] = stocks.first()
+    // minListDay[0] = 0
+
+    for (i in 1 until stocks.size)
+        if (stocks[i] < arrayOfMin[i - 1]) {
+            arrayOfMin[i] = stocks[i]
+            arrayOfMinDays[i] = i
+        } else {
+            arrayOfMin[i] = arrayOfMin[i - 1]
+            arrayOfMinDays[i] = arrayOfMinDays[i - 1]
+        }
+
+    val arrayOfMax = IntArray(stocks.size) { Int.MIN_VALUE }
+    val arrayOfMaxDays = IntArray(stocks.size) { 0 }
+
+    arrayOfMax[stocks.lastIndex] = stocks.last()
+    arrayOfMaxDays[stocks.lastIndex] = stocks.lastIndex
+
+    for (i in stocks.size - 2 downTo 0)
+        if (stocks[i] > arrayOfMax[i + 1]) {
+            arrayOfMax[i] = stocks[i]
+            arrayOfMaxDays[i] = i
+        } else {
+            arrayOfMax[i] = arrayOfMax[i + 1]
+            arrayOfMaxDays[i] = arrayOfMaxDays[i + 1]
+        }
+
+    var result = 1 to 2
+    var diff = 0
+
+    for (i in stocks.indices)
+        if (arrayOfMax[i] - arrayOfMin[i] > diff) {
+            diff = arrayOfMax[i] - arrayOfMin[i]
+            result = arrayOfMinDays[i] + 1 to arrayOfMaxDays[i] + 1
+        }
+
+    return result
 }
 
 /**
