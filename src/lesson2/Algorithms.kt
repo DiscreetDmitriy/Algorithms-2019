@@ -78,9 +78,17 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
  *
  * Общий комментарий: решение из Википедии для этой задачи принимается,
  * но приветствуется попытка решить её самостоятельно.
+ *
+ * //     Трудоёмкость: O(n)
+ * //     Ресурсоёмкость: O(1)
  */
 fun josephTask(menNumber: Int, choiceInterval: Int): Int {
-    TODO()
+    var result = 1
+
+    for (it in 2..menNumber)
+        result = (choiceInterval - 1 + result) % it + 1
+
+    return result
 }
 
 /**
