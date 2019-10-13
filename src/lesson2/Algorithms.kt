@@ -37,46 +37,18 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
         it.toInt()
     }
 
-    val arrayOfMin = IntArray(stocks.size) { Int.MAX_VALUE }
-    val arrayOfMinDays = IntArray(stocks.size) { 0 }
+    var maxDiff = Int.MIN_VALUE
+    var minIndex = 0
+    var buyAndSellMoments = 1 to 2
 
-    arrayOfMin[0] = stocks.first()
-    // minListDay[0] = 0
-
-    for (i in 1 until stocks.size)
-        if (stocks[i] < arrayOfMin[i - 1]) {
-            arrayOfMin[i] = stocks[i]
-            arrayOfMinDays[i] = i
-        } else {
-            arrayOfMin[i] = arrayOfMin[i - 1]
-            arrayOfMinDays[i] = arrayOfMinDays[i - 1]
+    for (i in 1 until stocks.size) {
+        if (maxDiff < stocks[i] - stocks[minIndex]) {
+            maxDiff = stocks[i] - stocks[minIndex]
+            buyAndSellMoments = minIndex + 1 to i + 1
         }
-
-    val arrayOfMax = IntArray(stocks.size) { Int.MIN_VALUE }
-    val arrayOfMaxDays = IntArray(stocks.size) { 0 }
-
-    arrayOfMax[stocks.lastIndex] = stocks.last()
-    arrayOfMaxDays[stocks.lastIndex] = stocks.lastIndex
-
-    for (i in stocks.size - 2 downTo 0)
-        if (stocks[i] > arrayOfMax[i + 1]) {
-            arrayOfMax[i] = stocks[i]
-            arrayOfMaxDays[i] = i
-        } else {
-            arrayOfMax[i] = arrayOfMax[i + 1]
-            arrayOfMaxDays[i] = arrayOfMaxDays[i + 1]
-        }
-
-    var result = 1 to 2
-    var diff = 0
-
-    for (i in stocks.indices)
-        if (arrayOfMax[i] - arrayOfMin[i] > diff) {
-            diff = arrayOfMax[i] - arrayOfMin[i]
-            result = arrayOfMinDays[i] + 1 to arrayOfMaxDays[i] + 1
-        }
-
-    return result
+        if (stocks[minIndex] > stocks[i]) minIndex = i
+    }
+    return buyAndSellMoments
 }
 
 /**
@@ -166,14 +138,15 @@ fun longestCommonSubstring(first: String, second: String): String {
     var maxLength = 0
     var bestEnd = 0
 
-    for (i in 1..first.length) {
-        for (j in 1..second.length)
-            if (first[i - 1] == second[j - 1]) {
-                current[j] = previous[j - 1] + 1
+    for (i in first.indices) {
+        for (j in second.indices)
+            if (first[i] == second[j]) {
+                current[j] =
+                    (if (j == 0) 0 else previous[j - 1]) + 1
 
                 if (current[j] > maxLength) {
                     maxLength = current[j]
-                    bestEnd = i
+                    bestEnd = j + 1
                 }
             } else
                 current[j] = 0
