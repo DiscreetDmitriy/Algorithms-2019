@@ -134,8 +134,8 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
 fun josephTask(menNumber: Int, choiceInterval: Int): Int {
     var result = 1
 
-    for (it in 2..menNumber)
-        result = (choiceInterval - 1 + result) % it + 1
+    for (i in 2..menNumber)
+        result = (choiceInterval - 1 + result) % i + 1
 
     return result
 }
@@ -150,9 +150,40 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * При сравнении подстрок, регистр символов *имеет* значение.
  * Если имеется несколько самых длинных общих подстрок одной длины,
  * вернуть ту из них, которая встречается раньше в строке first.
+ *
+ * //     Трудоёмкость: O(first.length * second.length)
+ * //     Ресурсоёмкость: O(min(first.length, second.length))
  */
 fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
+    require(first.isNotEmpty() && second.isNotEmpty())
+
+    if (first.length < second.length)
+        return longestCommonSubstring(second, first)
+
+    var previous = IntArray(second.length) { 0 }
+    var current = IntArray(second.length) { 0 }
+
+    var maxLength = 0
+    var bestEnd = 0
+
+    for (i in 1..first.length) {
+        for (j in 1..second.length)
+            if (first[i - 1] == second[j - 1]) {
+                current[j] = previous[j - 1] + 1
+
+                if (current[j] > maxLength) {
+                    maxLength = current[j]
+                    bestEnd = i
+                }
+            } else
+                current[j] = 0
+
+        val swap = previous
+        previous = current
+        current = swap
+    }
+
+    return second.substring(bestEnd - maxLength, bestEnd)
 }
 
 /**
