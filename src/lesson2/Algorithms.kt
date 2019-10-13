@@ -212,7 +212,53 @@ fun calcPrimesNumber(limit: Int): Int {
  * Все слова и буквы -- русские или английские, прописные.
  * В файле буквы разделены пробелами, строки -- переносами строк.
  * Остальные символы ни в файле, ни в словах не допускаются.
+ *
+ * //     Трудоёмкость: O(length * width)
+ * //     Ресурсоёмкость: O(length * width)
  */
 fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
-    TODO()
+    val matrix =
+        File(inputName).readLines()
+            .map { line ->
+                line.split(" ")
+                    .map { char -> char[0] }
+            }
+
+    val foundWords = mutableSetOf<String>()
+
+    for (y in matrix.indices)
+        for (x in matrix[y].indices)
+            for (word in words)
+                if (matrix[y][x] == word[0]
+                    && matrix.containsWord(
+                        partOfWord = word.substring(1),
+                        coordinates = x to y
+                    )
+                ) foundWords.add(word)
+
+    return foundWords
 }
+
+private fun List<List<Char>>.containsWord(
+    partOfWord: String, coordinates: Pair<Int, Int>
+): Boolean {
+    if (partOfWord.isEmpty()) return true
+
+    val directions = listOf(1 to 0, -1 to 0, 0 to 1, 0 to -1)
+
+    for ((dx, dy) in directions) {
+        val x = coordinates.first + dx
+        val y = coordinates.second + dy
+
+        if (x >= 0 && x < this[coordinates.second].size &&
+            y >= 0 && y < this.size && this[y][x] == partOfWord.first()
+            && this.containsWord(
+                partOfWord = partOfWord.substring(1),
+                coordinates = x to y
+            )
+        ) return true
+    }
+
+    return false
+}
+
