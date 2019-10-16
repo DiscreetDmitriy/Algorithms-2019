@@ -83,7 +83,7 @@ fun sortTimes(inputName: String, outputName: String) {
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  *
- * //     Трудоёмкость: O(log(n))
+ * //     Трудоёмкость: O(n)
  * //     Ресурсоёмкость: O(n)
  */
 fun sortAddresses(inputName: String, outputName: String) {

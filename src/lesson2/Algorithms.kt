@@ -213,7 +213,7 @@ fun calcPrimesNumber(limit: Int): Int {
  * В файле буквы разделены пробелами, строки -- переносами строк.
  * Остальные символы ни в файле, ни в словах не допускаются.
  *
- * //     Трудоёмкость: O(length * width)
+ * //     Трудоёмкость: O(length * width * words.size * word.length)
  * //     Ресурсоёмкость: O(length * width)
  */
 fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
