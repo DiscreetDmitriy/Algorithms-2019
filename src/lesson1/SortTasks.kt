@@ -144,27 +144,29 @@ fun sortAddresses(inputName: String, outputName: String) {
  * //     Ресурсоёмкость: O(1)
  */
 fun sortTemperatures(inputName: String, outputName: String) {
+    val tempRepeats = IntArray(7731) { 0 }
     val min = 273.0 * 10
-    var max = 0
 
-    File(outputName).writeText(
-        countingSort(
-            File(inputName).readLines()
-                .map { line ->
-                    val currDouble = line.toDouble()
+    val reader = File(inputName).bufferedReader()
+    var line = reader.readLine()
 
-                    require(currDouble in -273.0..500.0)
+    while (line != null) {
+        val tempDouble = line.toDouble()
 
-                    val currInt = (currDouble * 10 + min).toInt()
+        require(tempDouble in -273.0..500.0)
 
-                    if (max < currInt) max = currInt
+        val tempInt = (tempDouble * 10 + min).toInt()
 
-                    currInt
-                }
-                .toIntArray(), max)
-            .joinToString("\n") { temp ->
-                ((temp - min) / 10).toString()
-            })
+        tempRepeats[tempInt]++
+
+        line = reader.readLine()
+    }
+
+    File(outputName).bufferedWriter().use {
+        for (i in 0..7730)
+            if (tempRepeats[i] != 0)
+                it.write("${((i - 2730) / 10.0)}\n".repeat(tempRepeats[i]))
+    }
 }
 
 /**
