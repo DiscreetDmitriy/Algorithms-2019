@@ -1,6 +1,7 @@
 package lesson1
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.assertThrows
 import util.PerfResult
 import util.estimate
 import java.io.BufferedWriter
@@ -45,6 +46,14 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+
+        try {
+            assertThrows<Exception> {
+                sortTimes("input/time_in4.txt", "temp.txt")
+            }
+        } finally {
+            File("temp.txt").delete()
+        }
     }
 
     protected fun sortAddresses(sortAddresses: (String, String) -> Unit) {
@@ -70,6 +79,14 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         try {
             sortAddresses("input/addr_in3.txt", "temp.txt")
             assertFileContent("temp.txt", File("input/addr_out3.txt").readLines())
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try {
+            assertThrows<Exception> {
+                sortAddresses("input/addr_in4.txt", "temp.txt")
+            }
         } finally {
             File("temp.txt").delete()
         }
@@ -115,6 +132,14 @@ abstract class AbstractTaskTests : AbstractFileTests() {
                     121.3
                 """.trimIndent()
             )
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try {
+            assertThrows<Exception> {
+                sortTemperatures("input/temp_in2.txt", "temp.txt")
+            }
         } finally {
             File("temp.txt").delete()
         }
@@ -278,6 +303,14 @@ abstract class AbstractTaskTests : AbstractFileTests() {
             File("temp.txt").delete()
         }
 
+        try {
+            assertThrows<Exception> {
+                sortSequence("input/seq_in6.txt", "temp.txt")
+            }
+        } finally {
+            File("temp.txt").delete()
+        }
+
         fun testGeneratedSequence(totalSize: Int, answerSize: Int): PerfResult<Unit> {
             try {
                 val res = generateSequence(totalSize, answerSize)
@@ -326,6 +359,10 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         val result = arrayOf(null, null, null, null, null, 1, 3, 9, 13, 18, 23)
         mergeArrays(arrayOf(4, 9, 15, 20, 23), result)
         assertArrayEquals(arrayOf(1, 3, 4, 9, 9, 13, 15, 18, 20, 23, 23), result)
+
+        val result1: Array<Int?> = arrayOf(null)
+        mergeArrays(arrayOf(1), result1)
+        assertArrayEquals(arrayOf(1), result1)
 
         fun testGeneratedArrays(
             firstSize: Int,

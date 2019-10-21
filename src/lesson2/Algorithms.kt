@@ -1,5 +1,3 @@
-@file:Suppress("UNUSED_PARAMETER")
-
 package lesson2
 
 import java.io.File
@@ -106,6 +104,8 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
  * //     Ресурсоёмкость: O(1)
  */
 fun josephTask(menNumber: Int, choiceInterval: Int): Int {
+    require(menNumber > 0 && choiceInterval > 0 && menNumber >= choiceInterval)
+
     var result = 1
 
     for (i in 2..menNumber)
@@ -217,6 +217,8 @@ fun calcPrimesNumber(limit: Int): Int {
  * //     Ресурсоёмкость: O(length * width)
  */
 fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
+    require(inputName.isNotEmpty() && words.isNotEmpty())
+
     val matrix =
         File(inputName).readLines()
             .map { line ->
