@@ -1,8 +1,8 @@
 package lesson3
 
 import org.junit.jupiter.api.Tag
-import kotlin.test.Test
 import java.util.*
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -33,6 +33,10 @@ class BinaryTreeTest {
         assertTrue(tree.checkInvariant())
         assertEquals(1, tree.first())
         assertEquals(20, tree.last())
+
+        tree.add(Int.MAX_VALUE)
+        assertEquals(10, tree.size)
+        assertEquals(Int.MAX_VALUE, tree.last())
     }
 
     @Test
@@ -73,6 +77,10 @@ class BinaryTreeTest {
                 binarySet.height() <= originalHeight,
                 "After removal of $toRemove from $list binary tree height increased"
             )
+
+            assertFalse(binarySet.remove(Int.MAX_VALUE))
+            binarySet.add(Int.MAX_VALUE)
+            assertTrue(binarySet.remove(Int.MAX_VALUE))
         }
     }
 
@@ -91,7 +99,7 @@ class BinaryTreeTest {
             }
             val treeSet = TreeSet<Int>()
             val binarySet = create()
-//            assertFalse(binarySet.iterator().hasNext(), "Iterator of empty set should not have next element")
+            assertFalse(binarySet.iterator().hasNext(), "Iterator of empty set should not have next element")
             for (element in list) {
                 treeSet += element
                 binarySet += element
@@ -101,6 +109,8 @@ class BinaryTreeTest {
             println("Traversing $list")
             while (treeIt.hasNext()) {
                 assertEquals(treeIt.next(), binaryIt.next(), "Incorrect iterator state while iterating $treeSet")
+
+                assertEquals(treeIt.hasNext(), binaryIt.hasNext())
             }
             val iterator1 = binarySet.iterator()
             val iterator2 = binarySet.iterator()

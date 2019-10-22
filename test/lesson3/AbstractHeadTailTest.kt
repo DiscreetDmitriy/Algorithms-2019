@@ -47,6 +47,8 @@ abstract class AbstractHeadTailTest {
         assertEquals(false, set.contains(9))
         assertEquals(false, set.contains(10))
 
+        assertEquals(false, set.contains(Int.MAX_VALUE))
+
 
         set = tree.headSet(127)
         for (i in 1..10)
@@ -67,6 +69,8 @@ abstract class AbstractHeadTailTest {
         assertEquals(true, set.contains(9))
         assertEquals(true, set.contains(10))
 
+        assertEquals(false, set.contains(Int.MIN_VALUE))
+
         set = tree.tailSet(-128)
         for (i in 1..10)
             assertEquals(true, set.contains(i))
@@ -84,6 +88,9 @@ abstract class AbstractHeadTailTest {
         tree.add(12)
         assertFalse(set.contains(12))
         assertFailsWith<IllegalArgumentException> { set.add(8) }
+
+        assertFailsWith<IllegalArgumentException> { set.add(Int.MAX_VALUE) }
+
         assertEquals(8, set.size)
         assertEquals(13, tree.size)
     }
@@ -99,6 +106,10 @@ abstract class AbstractHeadTailTest {
         tree.add(0)
         assertFalse(set.contains(0))
         assertFailsWith<IllegalArgumentException> { set.add(-2) }
+
+        assertFailsWith<IllegalArgumentException> { set.add(Int.MIN_VALUE) }
+
+
         assertEquals(9, set.size)
         assertEquals(13, tree.size)
     }
@@ -118,6 +129,9 @@ abstract class AbstractHeadTailTest {
 
         assertFailsWith<IllegalArgumentException> { smallSet.add(2) }
         assertFailsWith<IllegalArgumentException> { smallSet.add(9) }
+
+        assertFailsWith<IllegalArgumentException> { smallSet.add(Int.MAX_VALUE) }
+        assertFailsWith<IllegalArgumentException> { smallSet.add(Int.MIN_VALUE) }
 
         val allSet = tree.subSet(-128, 128)
         for (i in 1..10)
