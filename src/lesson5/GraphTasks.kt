@@ -2,6 +2,9 @@
 
 package lesson5
 
+import lesson5.Graph.*
+import java.util.*
+
 /**
  * Эйлеров цикл.
  * Средняя
@@ -28,9 +31,43 @@ package lesson5
  * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
  * связного графа ровно по одному разу
  */
-fun Graph.findEulerLoop(): List<Graph.Edge> {
-    TODO()
+fun Graph.findEulerLoop(): List<Edge> {
+    if (this.vertices.isEmpty()
+        || this.edges.isEmpty()
+        || !this.hasEulerLoop()
+    ) return listOf()
+
+    val edges = this.edges
+    val vertexStack = Stack<Vertex>()
+    val eulerLoopEdges = mutableListOf<Edge>()
+
+    vertexStack.push(vertices.first())
+
+    while (vertexStack.isNotEmpty()) {
+        val currVertex = vertexStack.peek()
+
+        for (vertex in vertices) {
+            val edge = getConnection(currVertex, vertex) ?: continue
+
+            if (edges.contains(edge)) {
+                vertexStack.push(vertex)
+                edges.remove(edge)
+                break
+            }
+        }
+
+        if (currVertex == vertexStack.peek()) {
+            vertexStack.pop()
+
+            if (vertexStack.isNotEmpty())
+                eulerLoopEdges.add(getConnection(currVertex, vertexStack.peek())!!)
+        }
+    }
+
+    return eulerLoopEdges
 }
+
+private fun Graph.hasEulerLoop() = this.vertices.none { getNeighbors(it).size % 2 != 0 }
 
 /**
  * Минимальное остовное дерево.
@@ -90,7 +127,7 @@ fun Graph.minimumSpanningTree(): Graph {
  *
  * Эта задача может быть зачтена за пятый и шестой урок одновременно
  */
-fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
+fun Graph.largestIndependentVertexSet(): Set<Vertex> {
     TODO()
 }
 
