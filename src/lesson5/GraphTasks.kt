@@ -2,7 +2,9 @@
 
 package lesson5
 
-import lesson5.Graph.*
+import lesson5.Graph.Edge
+import lesson5.Graph.Vertex
+import lesson5.impl.GraphBuilder
 import java.util.*
 
 /**
@@ -98,7 +100,21 @@ private fun Graph.hasEulerLoop() = this.vertices.none { getNeighbors(it).size % 
  * J ------------ K
  */
 fun Graph.minimumSpanningTree(): Graph {
-    TODO()
+    val res = GraphBuilder()
+
+    if (vertices.isEmpty())
+        return res.build()
+
+    val info = shortestPath(vertices.first())
+
+    for (vertex in vertices)
+        res.addVertex(vertex.name)
+
+    for ((vertex, vertexInfo) in info)
+        if (vertexInfo.prev != null)
+            res.addConnection(vertexInfo.prev, vertex, vertexInfo.distance)
+
+    return res.build()
 }
 
 /**
