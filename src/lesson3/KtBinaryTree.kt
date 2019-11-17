@@ -5,27 +5,16 @@ import kotlin.NoSuchElementException
 import kotlin.math.max
 
 // Attention: comparable supported but comparator is not
-class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSortedSet<T> {
+@Suppress("SuspiciousVarProperty")
+open class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSortedSet<T> {
 
     private var root: Node<T>? = null
-    private var start: T? = null
-    private var end: T? = null
-
-    private constructor(root: Node<T>?, start: T?, end: T?) : this() {
-        this.root = root
-        this.start = start
-        this.end = end
-    }
-
-    private fun T.isValid() = (start == null || this >= start!!) && (end == null || this < end!!)
 
     override var size = 0
-        private set
         get() {
             var res = 0
             for (i in this)
-                if (i.isValid())
-                    res++
+                res++
             return res
         }
 
@@ -36,8 +25,6 @@ class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSort
     }
 
     override fun add(element: T): Boolean {
-        require(element.isValid())
-
         val closest = find(element)
         val comparison = if (closest == null) -1 else element.compareTo(closest.value)
         if (comparison == 0) {
@@ -139,7 +126,7 @@ class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSort
 
     override operator fun contains(element: T): Boolean {
         val closest = find(element)
-        return closest != null && closest.value.isValid() && element.compareTo(closest.value) == 0
+        return closest != null && element.compareTo(closest.value) == 0
     }
 
     private fun find(value: T): Node<T>? =
@@ -217,6 +204,34 @@ class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSort
 
     override fun comparator(): Comparator<in T>? = null
 
+    inner class BinarySubTree<T : Comparable<T>> internal constructor(
+        private val tree: KtBinaryTree<T>,
+        private val start: T?,
+        private val end: T?
+    ) : KtBinaryTree<T>() {
+
+        override var size: Int = 0
+            get() {
+                var res = 0
+                for (i in tree)
+                    if (i.isValid())
+                        res++
+                return res
+            }
+
+        override fun add(element: T): Boolean {
+            if (element.isValid())
+                return tree.add(element)
+            else
+                throw IllegalArgumentException()
+        }
+
+        override fun contains(element: T): Boolean =
+            tree.contains(element) && element.isValid()
+
+        private fun T.isValid() = (start == null || this >= start) && (end == null || this < end)
+    }
+
     /**
      * Найти множество всех элементов в диапазоне [fromElement, toElement)
      * Очень сложная
@@ -226,7 +241,7 @@ class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSort
      *  //     Трудоёмкость: O(1)
      *  //     Ресурсоёмкость: O(1)
      */
-    override fun subSet(fromElement: T, toElement: T): SortedSet<T> = KtBinaryTree(root, fromElement, toElement)
+    override fun subSet(fromElement: T, toElement: T): SortedSet<T> = BinarySubTree(this, fromElement, toElement)
 
     /**
      * Найти множество всех элементов меньше заданного
@@ -235,7 +250,7 @@ class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSort
      *  //     Трудоёмкость: O(1)
      *  //     Ресурсоёмкость: O(1)
      */
-    override fun headSet(toElement: T): SortedSet<T> = KtBinaryTree(root, null, toElement)
+    override fun headSet(toElement: T): SortedSet<T> = BinarySubTree(this, null, toElement)
 
     /**
      * Найти множество всех элементов больше или равных заданного
@@ -244,7 +259,7 @@ class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSort
      *  //     Трудоёмкость: O(1)
      *  //     Ресурсоёмкость: O(1)
      */
-    override fun tailSet(fromElement: T): SortedSet<T> = KtBinaryTree(root, fromElement, null)
+    override fun tailSet(fromElement: T): SortedSet<T> = BinarySubTree(this, fromElement, null)
 
     override fun first(): T {
         var current: Node<T> = root ?: throw NoSuchElementException()
