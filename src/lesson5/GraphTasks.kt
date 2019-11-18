@@ -32,6 +32,9 @@ import java.util.*
  *
  * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
  * связного графа ровно по одному разу
+ *
+ *  //     Трудоёмкость: O(V + E)
+ *  //     Ресурсоёмкость: O(V + E)
  */
 fun Graph.findEulerLoop(): List<Edge> {
     if (this.vertices.isEmpty()
@@ -98,6 +101,9 @@ private fun Graph.hasEulerLoop() = this.vertices.none { getNeighbors(it).size % 
  * E    F    I
  * |
  * J ------------ K
+ *
+ *  //     Трудоёмкость: O(V + E)
+ *  //     Ресурсоёмкость: O(V + E)
  */
 fun Graph.minimumSpanningTree(): Graph {
     val res = GraphBuilder()
