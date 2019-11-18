@@ -22,6 +22,17 @@ class GraphBuilder {
         override fun getEnd() = _end
 
         override fun getWeight() = weightField
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || javaClass != other.javaClass) return false
+            val that = other as EdgeImpl
+            return (begin == that.begin && end == that.end) || (begin == that.end && end == that.begin)
+        }
+
+        override fun hashCode(): Int {
+            return 31 * (_begin.hashCode() + _end.hashCode())
+        }
     }
 
     private val vertices = mutableMapOf<String, Vertex>()
