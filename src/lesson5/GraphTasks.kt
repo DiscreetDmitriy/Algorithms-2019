@@ -46,13 +46,13 @@ fun Graph.findEulerLoop(): List<Edge> {
     val vertexStack = Stack<Vertex>()
     val eulerLoopEdges = mutableListOf<Edge>()
 
-    vertexStack.push(vertices.first())
+    vertexStack.push(this.vertices.first())
 
     while (vertexStack.isNotEmpty()) {
         val currVertex = vertexStack.peek()
 
-        for (vertex in vertices) {
-            val edge = getConnection(currVertex, vertex) ?: continue
+        for (vertex in this.vertices) {
+            val edge = this.getConnection(currVertex, vertex) ?: continue
 
             if (edges.contains(edge)) {
                 vertexStack.push(vertex)
@@ -65,14 +65,14 @@ fun Graph.findEulerLoop(): List<Edge> {
             vertexStack.pop()
 
             if (vertexStack.isNotEmpty())
-                eulerLoopEdges.add(getConnection(currVertex, vertexStack.peek())!!)
+                eulerLoopEdges.add(this.getConnection(currVertex, vertexStack.peek())!!)
         }
     }
 
     return eulerLoopEdges
 }
 
-private fun Graph.hasEulerLoop() = this.vertices.none { getNeighbors(it).size % 2 != 0 }
+private fun Graph.hasEulerLoop() = this.vertices.none { this.getNeighbors(it).size % 2 != 0 }
 
 /**
  * Минимальное остовное дерево.
@@ -108,12 +108,13 @@ private fun Graph.hasEulerLoop() = this.vertices.none { getNeighbors(it).size % 
 fun Graph.minimumSpanningTree(): Graph {
     val res = GraphBuilder()
 
-    if (vertices.isEmpty())
-        return res.build()
+    if (this.vertices.isEmpty()
+        || this.edges.isEmpty()
+    ) return res.build()
 
-    val info = shortestPath(vertices.first())
+    val info = this.shortestPath(this.vertices.first())
 
-    for (vertex in vertices)
+    for (vertex in this.vertices)
         res.addVertex(vertex.name)
 
     for ((vertex, vertexInfo) in info)
@@ -148,10 +149,86 @@ fun Graph.minimumSpanningTree(): Graph {
  * Если на входе граф с циклами, бросить IllegalArgumentException
  *
  * Эта задача может быть зачтена за пятый и шестой урок одновременно
+ *
+ *  //     Трудоёмкость: O(V + E)
+ *  //     Ресурсоёмкость: O(V^2)
  */
 fun Graph.largestIndependentVertexSet(): Set<Vertex> {
-    TODO()
+    if (this.vertices.isEmpty()
+        || this.edges.isEmpty()
+    ) return emptySet()
+
+    val bridges = this.findBridges()
+
+    require(bridges.isNotEmpty())
+
+    val independentSets = mutableMapOf<Vertex, Set<Vertex>>()
+    val independentVertices = mutableSetOf<Vertex>()
+    val unconnectedVerticesSet = this.unconnectedVerticesSet()
+
+    for (vertex in unconnectedVerticesSet)
+        independentVertices.addAll(
+            this.independentVerticesSet(
+                independentSets = independentSets,
+                parent = null,
+                vertex = vertex
+            )
+        )
+
+    return independentVertices
 }
+
+private fun Graph.unconnectedVerticesSet(): Set<Vertex> {
+    val unconnectedVertices = mutableSetOf<Vertex>()
+
+    this.dfs(this.vertices.first())
+
+    unconnectedVertices.add(this.vertices.first())
+
+    for (vertex in this.vertices)
+        if (!vertex.isVisited) {
+            unconnectedVertices.add(vertex)
+            this.dfs(vertex)
+        }
+
+    return unconnectedVertices
+}
+
+private fun Graph.dfs(vertex: Vertex) {
+    vertex.isVisited = true
+
+    for (neighbour in this.getNeighbors(vertex))
+        if (!neighbour.isVisited)
+            this.dfs(neighbour)
+}
+
+private fun Graph.independentVerticesSet(
+    independentSets: MutableMap<Vertex, Set<Vertex>>,
+    parent: Vertex?,
+    vertex: Vertex
+): Set<Vertex> = independentSets.getOrPut(vertex) {
+    val children = this.independentChildrenList(independentSets, parent, vertex)
+
+    val grandChildren =
+        this.getNeighbors(vertex)
+            .filterNot { it == parent }
+            .flatMap { this.independentChildrenList(independentSets, vertex, it) }
+            .plus(vertex)
+
+    if (grandChildren.size < children.size - 1)
+        children.toSet()
+    else
+        grandChildren.toSet()
+}
+
+private fun Graph.independentChildrenList(
+    independentSets: MutableMap<Vertex, Set<Vertex>>,
+    parent: Vertex?,
+    vertex: Vertex
+): List<Vertex> = this.getNeighbors(vertex)
+    .filterNot { it == parent }
+    .flatMap { this.independentVerticesSet(independentSets, vertex, it) }
+
 
 /**
  * Наидлиннейший простой путь.
@@ -172,7 +249,33 @@ fun Graph.largestIndependentVertexSet(): Set<Vertex> {
  * J ------------ K
  *
  * Ответ: A, E, J, K, D, C, H, G, B, F, I
+ *
+ *  //     Трудоёмкость: O(V!)
+ *  //     Ресурсоёмкость: O(V!)
  */
 fun Graph.longestSimplePath(): Path {
-    TODO()
+    if (this.vertices.isEmpty()
+        || this.edges.isEmpty()
+    ) return Path()
+
+    var longestPath = Path(this.vertices.first())
+    val queue = PriorityQueue<Path>()
+
+    this.vertices.mapTo(queue) { Path(it) }
+
+    while (queue.isNotEmpty()) {
+        val current = queue.poll()
+
+        if (current.length > longestPath.length)
+            longestPath = current
+
+        val last = current.vertices.last()
+        val neighbors = this.getNeighbors(last)
+
+        for (it in neighbors)
+            if (it !in current)
+                queue.add(Path(current, this, it))
+    }
+
+    return longestPath
 }

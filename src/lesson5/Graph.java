@@ -11,6 +11,10 @@ public interface Graph {
     interface Vertex {
         @NotNull
         String getName();
+
+        boolean isVisited();
+
+        void setVisited(boolean b);
     }
 
     interface Edge {
@@ -35,7 +39,7 @@ public interface Graph {
     Vertex get(String name);
 
     @NotNull
-    default Set<Vertex> getNeighbors(@NotNull  Vertex v) {
+    default Set<Vertex> getNeighbors(@NotNull Vertex v) {
         return getConnections(v).keySet();
     }
 

@@ -7,6 +7,14 @@ import lesson5.Graph.Vertex
 class GraphBuilder {
 
     data class VertexImpl(private val nameField: String) : Vertex {
+        private var isVisited = false
+
+        override fun isVisited(): Boolean = isVisited
+
+        override fun setVisited(b: Boolean) {
+            isVisited = b
+        }
+
         override fun getName() = nameField
 
         override fun toString() = name
