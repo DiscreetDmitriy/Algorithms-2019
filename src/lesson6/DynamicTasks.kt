@@ -29,9 +29,36 @@ fun longestCommonSubSequence(first: String, second: String): String {
  * Если самых длинных возрастающих подпоследовательностей несколько (как в примере),
  * то вернуть ту, в которой числа расположены раньше (приоритет имеют первые числа).
  * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
+ *
+ *  //     Трудоёмкость: O(n^2)
+ *  //     Ресурсоёмкость: O(n)
  */
 fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
-    TODO()
+    if (list.isEmpty())
+        return list
+
+    val tailIndices = IntArray(list.size) { 1 }
+    val prevIndices = IntArray(list.size) { -1 }
+    var lastIndex = 0
+
+    for (i in list.indices)
+        for (j in 0 until i)
+            if (list[i] > list[j] && tailIndices[i] < tailIndices[j] + 1) {
+                tailIndices[i] = tailIndices[j] + 1
+                prevIndices[i] = j
+
+                if (tailIndices[i] > tailIndices[lastIndex])
+                    lastIndex = i
+            }
+
+    val subSequence = mutableListOf<Int>()
+
+    while (lastIndex != -1) {
+        subSequence.add(list[lastIndex])
+        lastIndex = prevIndices[lastIndex]
+    }
+
+    return subSequence.reversed()
 }
 
 /**
