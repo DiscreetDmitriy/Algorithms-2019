@@ -55,6 +55,16 @@ abstract class AbstractDynamicTests {
                 )
             )
         )
+
+        assertEquals(
+            listOf(1),
+            longestIncreasingSubSequence(listOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+        )
+        assertEquals(
+            listOf(Integer.MIN_VALUE, Int.MAX_VALUE),
+            longestIncreasingSubSequence(listOf(Int.MIN_VALUE, Int.MAX_VALUE))
+        )
+
     }
 
     fun shortestPathOnField(shortestPathOnField: (String) -> Int) {
