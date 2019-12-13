@@ -116,6 +116,14 @@ abstract class AbstractHeadTailTest {
 
     protected fun doSubSetTest() {
         val smallSet: SortedSet<Int> = tree.subSet(3, 8)
+
+        assertEquals(3, smallSet.first())
+        assertEquals(7, smallSet.last())
+
+        assertTrue(smallSet.remove(3))
+
+        smallSet.add(3)
+
         assertEquals(false, smallSet.contains(1))
         assertEquals(false, smallSet.contains(2))
         assertEquals(true, smallSet.contains(3))

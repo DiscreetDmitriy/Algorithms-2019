@@ -4,6 +4,7 @@ import java.util.*
 import kotlin.NoSuchElementException
 import kotlin.math.max
 
+
 // Attention: comparable supported but comparator is not
 @Suppress("SuspiciousVarProperty")
 open class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSortedSet<T> {
@@ -18,10 +19,18 @@ open class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableS
             return res
         }
 
-    private class Node<T>(var value: T) {
+    inner class Node<T>(var value: T) {
         var left: Node<T>? = null
         var right: Node<T>? = null
         var parent: Node<T>? = null
+
+        fun minimum(): Node<T>? {
+            var current: Node<T>? = this
+            while (current!!.left != null) {
+                current = current.left
+            }
+            return current
+        }
     }
 
     override fun add(element: T): Boolean {
@@ -141,7 +150,7 @@ open class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableS
         }
     }
 
-    inner class BinaryTreeIterator internal constructor() : MutableIterator<T> {
+    open inner class BinaryTreeIterator internal constructor() : MutableIterator<T> {
 
         private var current: Node<T>? = null
         private var stack: Stack<Node<T>> = Stack()
@@ -219,6 +228,9 @@ open class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableS
                 return res
             }
 
+        override fun contains(element: T): Boolean =
+            tree.contains(element) && element.isValid()
+
         override fun add(element: T): Boolean {
             if (element.isValid())
                 return tree.add(element)
@@ -226,8 +238,28 @@ open class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableS
                 throw IllegalArgumentException()
         }
 
-        override fun contains(element: T): Boolean =
-            tree.contains(element) && element.isValid()
+        override fun remove(element: T): Boolean {
+            if (element.isValid())
+                return tree.remove(element)
+            else
+                throw IllegalArgumentException()
+        }
+
+        override fun first(): T {
+            for (i in tree)
+                if (i.isValid())
+                    return i
+
+            throw NoSuchElementException()
+        }
+
+        override fun last(): T {
+            for (i in tree.reversed())
+                if (i.isValid())
+                    return i
+
+            throw NoSuchElementException()
+        }
 
         private fun T.isValid() = (start == null || this >= start) && (end == null || this < end)
     }
@@ -267,6 +299,14 @@ open class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableS
             current = current.left!!
         }
         return current.value
+    }
+
+    private fun firstNode(): Node<T> {
+        var current: Node<T> = root ?: throw NoSuchElementException()
+        while (current.left != null) {
+            current = current.left!!
+        }
+        return current
     }
 
     override fun last(): T {
